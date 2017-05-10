@@ -408,7 +408,7 @@ jobs:
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
 - name: tomcat-7
   plan:
   - aggregate:
@@ -426,7 +426,7 @@ jobs:
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
 - name: tomcat-8.0
   plan:
   - aggregate:
@@ -444,7 +444,7 @@ jobs:
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
 - name: tomcat-8.5
   plan:
   - aggregate:
@@ -462,7 +462,7 @@ jobs:
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
 - name: google-stackdriver-debugger-trusty 
   plan:
   - aggregate:
@@ -479,7 +479,7 @@ jobs:
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
 
 <% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
 - name: <%= resource %>
@@ -498,6 +498,6 @@ jobs:
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
 <% end %>
 
