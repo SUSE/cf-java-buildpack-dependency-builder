@@ -4,12 +4,14 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: cfje/google-stackdriver-debugger
+    repository: splatform/google-stackdriver-debugger
     tag: cflinuxfs3m
 
 inputs:
 - name: cloud-debug-java
 - name: java-buildpack-dependency-builder
+outputs:
+- name: source-artifacts
 
 run:
   path: java-buildpack-dependency-builder/google-stackdriver-debugger.sh

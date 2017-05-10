@@ -19,13 +19,13 @@ aws s3 sync "s3://download.pivotal.io" "$DESTINATION" --no-sign-request --exclud
   --include "client-certificate-mapper/*" \
   --include "container-customizer/*" \
   --include "container-security-provider/*" \
-  --include "google-stackdriver-debugger/*" \
+  --include "google-stackdriver-profiler/*" \
+  --include "jacoco/*" \
   --include "groovy/*" \
   --include "jvmkill/*" \
   --include "mariadb-jdbc/*" \
   --include "memory-calculator/*" \
   --include "metric-writer/*" \
-  --include "openjdk/*" \
   --include "postgresql-jdbc/*" \
   --include "redis-store/*" \
   --include "spring-boot-cli/*" \
@@ -41,4 +41,6 @@ aws s3 sync "s3://download.pivotal.io" "$DESTINATION" --no-sign-request --exclud
   --exclude "*/mountainlion/*" \
   --exclude "*/precise/*"
 
-find "$DESTINATION" -name "index.yml" | xargs sed -ie "s|https://java-buildpack.cloudfoundry.org|$BASE_URI|g"
+find "$DESTINATION" -name "index.yml" | xargs sed -i "s|https://java-buildpack.cloudfoundry.org|$BASE_URI|g"
+
+aws s3 sync "$DESTINATION" "s3://${S3_BUCKET}"

@@ -1,0 +1,418 @@
+# This pipeline syncs the upstream bucket with the target_bucket.
+# It also builds openjdk and pushes it to the same bucket (target_bucket).
+---
+
+resource_types:
+  - name: java-resource
+    type: docker-image
+    source:
+      repository: splatform/java-resource
+      tag: latest
+
+resources:
+ ## Git Repos ##
+
+# Note: When testing different branches, you probably want to set
+# `java-buildpack-dependency-builder-git-branch` in ci/public-config.yml for
+# every resource that refers to `java-buildpack-dependency-builder-git-uri`.
+# Multiple resources for this URL are used to trigger on specific build
+# scripts.
+- name: java-buildpack-dependency-builder
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
+
+- name: java-buildpack-dependency-builder-docker-image
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
+    paths:
+    - java-buildpack-dependency-builder/Dockerfile
+
+- name: google-stackdriver-debugger-trusty-docker-image
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
+    paths:
+    - google-stackdriver-debugger/cflinuxfs2/Dockerfile
+
+- name: google-stackdriver-debugger-bionic-docker-image
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
+    paths:
+    - google-stackdriver-debugger/cflinuxfs3m/Dockerfile
+
+- name: openjdk-docker-image
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
+    paths:
+    - openjdk/cflinuxfs2/Dockerfile
+
+- name: openjdk
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
+    paths:
+    - openjdk*
+
+- name: java-archives
+  type: java-resource
+  source:
+    # Debug using something like this:
+    # https://github.com/concourse/concourse/issues/1096#issuecomment-314521154
+    # E.g. Run this inside the splatform/java-resource container:
+    # ./opt/resource/check <<JSON
+    # { "source": { "uri": "https://www.oracle.com/technetwork/java/javase/8u-relnotes-2225394.html", "version_pattern": "(\\\\d)\\\\.(\\\\d)\\\\.0_(\\\\d{1,3})-b?(\\\\d{1,3})" } }
+    # JSON
+    uri: https://www.oracle.com/technetwork/java/javase/8u-relnotes-2225394.html
+    version_pattern: (\d)\.(\d)\.0_(\d{1,3})-b?(\d{1,3})
+
+- name: cloud-debug-java
+  type: git
+  source:
+    uri: https://github.com/GoogleCloudPlatform/cloud-debug-java
+    tag_filter: v2.19
+
+ ## Docker Images ##
+
+- name: openjdk-8-jre-alpine
+  type: docker-image
+  source:
+    repository: openjdk
+    tag: 8-jre-alpine
+
+- name: alpine-latest
+  type: docker-image
+  source:
+    repository: alpine
+
+- name: cflinuxfs2-latest
+  type: docker-image
+  source:
+    repository: cloudfoundry/cflinuxfs2
+
+- name: cflinuxfs3m-latest
+  type: docker-image
+  source:
+    repository: cloudfoundry/cflinuxfs3m
+
+- name: ubuntu-trusty
+  type: docker-image
+  source:
+    repository: ubuntu
+    tag: latest
+
+- name: java-buildpack-dependency-builder-latest
+  type: docker-image
+  source:
+    repository: splatform/java-buildpack-dependency-builder
+    username: {{docker-username}}
+    password: {{docker-password}}
+
+- name: java-resource-latest
+  type: docker-image
+  source:
+    repository: splatform/java-resource
+    username: {{docker-username}}
+    password: {{docker-password}}
+
+- name: openjdk-latest
+  type: docker-image
+  source:
+    repository: splatform/openjdk
+    username: {{docker-username}}
+    password: {{docker-password}}
+
+- name: google-stackdriver-debugger-latest
+  type: docker-image
+  source:
+    repository: splatform/google-stackdriver-debugger
+    username: {{docker-username}}
+    password: {{docker-password}}
+
+- name: google-stackdriver-debugger-bionic
+  type: docker-image
+  source:
+    repository: splatform/google-stackdriver-debugger
+    tag: cflinuxfs3m
+    username: {{docker-username}}
+    password: {{docker-password}}
+
+- name: cacerts-keystores
+  type: s3
+  source:
+    bucket: download.pivotal.io
+    regexp: cacerts/cacerts-(.*).jks
+
+groups:
+- name: docker
+  jobs:
+  - java-docker-image
+  - java-buildpack-dependency-builder-docker-image
+  - openjdk-docker-image
+  - google-stackdriver-debugger-trusty-docker-image
+  - google-stackdriver-debugger-bionic-docker-image
+- name: java-buildpack-dependency-builder
+  jobs:
+  - sync-non-built-dependencies
+  - openjdk-trusty
+  - openjdk11-trusty
+  - openjdk-bionic
+  - openjdk11-bionic
+  - google-stackdriver-debugger-trusty
+  - google-stackdriver-debugger-bionic
+
+jobs:
+- name: java-docker-image
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder
+      # trigger: true
+    - get: openjdk-8-jre-alpine
+      trigger: true
+  - do:
+    task: build
+    file: java-buildpack-dependency-builder/resources/ci/build.yml
+  - put: java-resource-latest
+    params:
+      build: java-resource-docker-image
+- name: sync-non-built-dependencies
+  plan:
+  # TODO: Find more ways to trigger by monitoring the upstream releases?
+  - get: java-buildpack-dependency-builder
+    # trigger: true
+  - task: sync_with_upstream
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: splatform/concourse-aws-helm
+      inputs:
+      - name: java-buildpack-dependency-builder
+      params:
+        S3_BUCKET: {{target_bucket}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        # TODO: move to variable
+        BASE_URI: https://suse-cf-java-buildpack.s3.amazonaws.com
+        DESTINATION: out
+      run:
+        path: java-buildpack-dependency-builder/replicate.sh
+- name: java-buildpack-dependency-builder-docker-image
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder-docker-image
+      trigger: true
+    - get: alpine-latest
+      trigger: true
+  - do:
+    - put: java-buildpack-dependency-builder-latest
+      params:
+        build: java-buildpack-dependency-builder-docker-image/java-buildpack-dependency-builder
+      get_params:
+        skip_download: true
+
+- name: openjdk-docker-image
+  plan:
+  - aggregate:
+    - get: openjdk-docker-image
+      trigger: true
+    - get: ubuntu-trusty
+      trigger: true
+  - do:
+    - put: openjdk-latest
+      params:
+        build: openjdk-docker-image/openjdk/cflinuxfs2
+      get_params:
+        skip_download: true
+
+- name: google-stackdriver-debugger-trusty-docker-image
+  plan:
+  - aggregate:
+    - get: google-stackdriver-debugger-trusty-docker-image
+      trigger: true
+    - get: cflinuxfs2-latest
+      trigger: true
+  - do:
+    - put: google-stackdriver-debugger-latest
+      params:
+        build: google-stackdriver-debugger-trusty-docker-image/google-stackdriver-debugger/cflinuxfs2
+      get_params:
+        skip_download: true
+
+- name: google-stackdriver-debugger-bionic-docker-image
+  plan:
+  - aggregate:
+    - get: google-stackdriver-debugger-bionic-docker-image
+      trigger: true
+    - get: cflinuxfs3m-latest
+      trigger: true
+  - do:
+    - put: google-stackdriver-debugger-bionic
+      params:
+        build: google-stackdriver-debugger-bionic-docker-image/google-stackdriver-debugger/cflinuxfs3m
+      get_params:
+        skip_download: true
+
+- name: openjdk-trusty
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder
+      # trigger: true
+    - get: java-archives
+    - get: openjdk
+    - get: cacerts-keystores
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/openjdk-trusty.yml
+      params:
+        S3_BUCKET: {{target_bucket}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: java-buildpack-dependency-builder/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
+
+- name: openjdk11-trusty
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder
+      # trigger: true
+    - get: java-archives
+    - get: openjdk
+    - get: cacerts-keystores
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/openjdk11-trusty.yml
+      params:
+        S3_BUCKET: {{target_bucket}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: java-buildpack-dependency-builder/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
+
+- name: openjdk-bionic
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder
+      # trigger: true
+    - get: java-archives
+    - get: openjdk
+    - get: cacerts-keystores
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/openjdk-bionic.yml
+      params:
+        S3_BUCKET: {{target_bucket}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: java-buildpack-dependency-builder/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
+
+- name: openjdk11-bionic
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder
+      # trigger: true
+    - get: java-archives
+    - get: openjdk
+    - get: cacerts-keystores
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/openjdk11-bionic.yml
+      params:
+        S3_BUCKET: {{target_bucket}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: java-buildpack-dependency-builder/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
+
+- name: google-stackdriver-debugger-trusty
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder
+      # trigger: true
+    - get: cloud-debug-java
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/google-stackdriver-debugger-trusty.yml
+      params:
+        S3_BUCKET: {{target_bucket}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: java-buildpack-dependency-builder/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
+
+- name: google-stackdriver-debugger-bionic
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder
+      # trigger: true
+    - get: cloud-debug-java
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/google-stackdriver-debugger-bionic.yml
+      params:
+        S3_BUCKET: {{target_bucket}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: java-buildpack-dependency-builder/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
