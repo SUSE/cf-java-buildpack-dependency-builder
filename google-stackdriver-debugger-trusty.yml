@@ -4,7 +4,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: cfje/google-stackdriver-debugger
+    repository: splatform/google-stackdriver-debugger
     tag: latest
 
 inputs:
