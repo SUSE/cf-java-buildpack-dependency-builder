@@ -1,0 +1,503 @@
+---
+<% resource_names = %w(maven tomcat wildfly your-kit artifactory) %>
+resource_types:
+<% resource_names.each do |resource| %>
+- name: <%= resource %>-resource
+  type: docker-image
+  source:
+    repository: splatform/<%= resource %>-resource
+    tag: latest
+<% end %>
+
+<% maven_based_resource_names = %w(groovy tomee new-relic mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-certificate-trust-store container-customizer) %>
+
+<% artifactory_based_resource_names = %w(memory-calculator jvmkill auto-reconfiguration play-jpa-plugin redis-store) %>
+
+<% tomcat_based_resource_names = %w(tomcat-7 tomcat-8.0 tomcat-8.5) %>
+
+<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty) %>
+
+resources:
+
+ ## Git Repos ##
+
+- name: resources
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+
+- name: java-buildpack-dependency-builder-docker-image
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    paths:
+    - java-buildpack-dependency-builder/Dockerfile
+
+- name: openjdk-docker-image
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    paths:
+    - openjdk/Dockerfile
+
+- name: google-stackdriver-debugger-docker-image
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    paths:
+    - google-stackdriver-debugger/Dockerfile
+
+- name: openjdk
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    paths:
+    - openjdk*
+
+- name: tomcat
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    paths:
+    - tomcat.*
+
+- name: tomcat-7-archives
+  type: tomcat-resource
+  source:
+    uri: https://archive.apache.org/dist/tomcat/tomcat-7
+
+- name: tomcat-8.0-archives
+  type: tomcat-resource
+  source:
+    uri: https://archive.apache.org/dist/tomcat/tomcat-8
+    version_pattern: (8\.0\..+)
+
+- name: tomcat-8.5-archives
+  type: tomcat-resource
+  source:
+    uri: https://archive.apache.org/dist/tomcat/tomcat-8
+    version_pattern: (8\.5\..+)
+
+<% wildcard_git_repos.each do |repo| %>
+- name: <%= repo %>
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    paths:
+    - <%= repo %>*
+<% end %>
+
+- name: groovy-archives
+  type: maven-resource
+  source:
+    uri: https://dl.bintray.com/groovy/maven
+    artifact_id: groovy-binary
+    group_id: org.codehaus.groovy
+    packaging: zip
+    version_pattern: (2\.4\..+)
+
+- name: tomee-archives
+  type: maven-resource
+  source:
+    uri: http://repo.maven.apache.org/maven2
+    artifact_id: apache-tomee
+    group_id: org.apache.tomee
+    packaging: tar.gz
+    classifier: webprofile
+
+- name: wildfly-archives
+  type: wildfly-resource
+
+- name: your-kit-archives
+  type: your-kit-resource
+
+- name: new-relic-archives
+  type: maven-resource
+  source:
+    uri: https://repo1.maven.org/maven2
+    artifact_id: newrelic-agent
+    group_id: com.newrelic.agent.java
+    packaging: jar
+
+- name: mariadb-jdbc-archives
+  type: maven-resource
+  source:
+    uri: https://repo1.maven.org/maven2
+    artifact_id: mariadb-java-client
+    group_id: org.mariadb.jdbc
+    packaging: jar
+    version_pattern: (1\..+)
+
+- name: postgresql-jdbc-archives
+  type: maven-resource
+  source:
+    uri: https://repo1.maven.org/maven2
+    artifact_id: postgresql
+    group_id: org.postgresql
+    packaging: jar
+    version_pattern: (9\.4\..+)
+
+- name: spring-boot-cli-archives
+  type: maven-resource
+  source:
+    uri: https://repo.spring.io/release
+    artifact_id: spring-boot-cli
+    group_id: org.springframework.boot
+    packaging: tar.gz
+    classifier: bin
+
+- name: tomcat-access-logging-support-archives
+  type: maven-resource
+  source:
+    uri: https://maven.springframework.org/release
+    artifact_id: tomcat-access-logging-support
+    group_id: org.cloudfoundry
+    packaging: jar
+
+- name: tomcat-lifecycle-support-archives
+  type: maven-resource
+  source:
+    uri: https://maven.springframework.org/release
+    artifact_id: tomcat-lifecycle-support
+    group_id: org.cloudfoundry
+    packaging: jar
+
+- name: tomee-resource-configuration-archives
+  type: maven-resource
+  source:
+    uri: https://maven.springframework.org/release
+    artifact_id: tomee-resource-configuration
+    group_id: org.cloudfoundry
+    packaging: jar
+
+- name: tomcat-logging-support-archives
+  type: maven-resource
+  source:
+    uri: https://maven.springframework.org/release
+    artifact_id: tomcat-logging-support
+    group_id: org.cloudfoundry
+    packaging: jar
+
+- name: container-certificate-trust-store-archives
+  type: maven-resource
+  source:
+    uri: https://repo.spring.io/release
+    artifact_id: java-buildpack-container-certificate-trust-store
+    group_id: org.cloudfoundry
+    packaging: jar
+
+- name: container-customizer-archives
+  type: maven-resource
+  source:
+    uri: https://repo.spring.io/release
+    artifact_id: java-buildpack-container-customizer
+    group_id: org.cloudfoundry
+    packaging: jar
+
+- name: memory-calculator-archives
+  type: artifactory-resource
+  source:
+    uri: https://repo.spring.io
+    artifact_id: java-buildpack-memory-calculator
+    group_id: org.cloudfoundry
+    repository: libs-release-local
+
+- name: jvmkill-archives
+  type: artifactory-resource
+  source:
+    uri: https://repo.spring.io
+    artifact_id: jvmkill
+    group_id: org.cloudfoundry
+    repository: libs-release-local
+
+- name: auto-reconfiguration-archives
+  type: artifactory-resource
+  source:
+    uri: https://repo.spring.io
+    artifact_id: java-buildpack-auto-reconfiguration
+    group_id: org.cloudfoundry
+    repository: libs-snapshot-local
+
+- name: play-jpa-plugin-archives
+  type: artifactory-resource
+  source:
+    uri: https://repo.spring.io
+    artifact_id: play-jpa-plugin
+    group_id: org.cloudfoundry
+    repository: libs-snapshot-local
+
+- name: redis-store-archives
+  type: artifactory-resource
+  source:
+    uri: https://repo.spring.io
+    artifact_id: redis-store
+    group_id: com.gopivotal.manager
+    repository: libs-snapshot-local
+
+- name: cloud-debug-java
+  type: git
+  source:
+    uri: https://github.com/GoogleCloudPlatform/cloud-debug-java
+
+ ## Docker Images ##
+
+- name: openjdk-8-jre-alpine
+  type: docker-image
+  source:
+    repository: openjdk
+    tag: 8-jre-alpine
+
+- name: alpine-latest
+  type: docker-image
+  source:
+    repository: alpine
+            
+- name: cflinuxfs2-latest
+  type: docker-image
+  source:
+    repository: cloudfoundry/cflinuxfs2
+            
+- name: ubuntu-trusty
+  type: docker-image
+  source:
+    repository: ubuntu
+    tag: latest
+
+- name: java-buildpack-dependency-builder-latest
+  type: docker-image
+  source:
+    repository: splatform/java-buildpack-dependency-builder
+    username: {{dockerhub-username}}
+    password: {{dockerhub-password}}
+    email: cf-ci-bot@suse.de
+
+- name: openjdk-latest
+  type: docker-image
+  source:
+    repository: splatform/openjdk
+    username: {{dockerhub-username}}
+    password: {{dockerhub-password}}
+    email: cf-ci-bot@suse.de
+
+- name: google-stackdriver-debugger-latest
+  type: docker-image
+  source:
+    repository: splatform/google-stackdriver-debugger
+    username: {{dockerhub-username}}
+    password: {{dockerhub-password}}
+    email: cf-ci-bot@suse.de
+
+<% resource_names.each do |resource| %>
+- name: <%= resource %>-resource-latest
+  type: docker-image
+  source:
+    repository: splatform/<%= resource %>-resource
+    username: {{dockerhub-username}}
+    password: {{dockerhub-password}}
+    email: cf-ci-bot@suse.de
+<% end %>
+
+groups:
+- name: docker
+  jobs: 
+  - resource-docker-images
+  - java-buildpack-dependency-builder-docker-image
+  - openjdk-docker-image
+  - google-stackdriver-debugger-docker-image
+- name: java-buildpack-dependency-builder
+  jobs:
+  - tomcat-7
+  - tomcat-8.0
+  - tomcat-8.5
+  - openjdk-trusty
+  - google-stackdriver-debugger-trusty
+  - tomee
+  - groovy
+  - jvmkill
+  - wildfly
+  - your-kit
+  - new-relic
+  - redis-store
+  - mariadb-jdbc
+  - play-jpa-plugin
+  - postgresql-jdbc
+  - spring-boot-cli
+  - memory-calculator
+  - auto-reconfiguration
+  - container-customizer
+  - tomcat-logging-support
+  - tomcat-lifecycle-support
+  - tomee-resource-configuration
+  - tomcat-access-logging-support
+  - container-certificate-trust-store
+
+
+jobs:
+- name: resource-docker-images
+  plan:
+  - aggregate:
+    - resource: resources
+      get: java-buildpack-dependency-builder
+      trigger: true
+    - get: openjdk-8-jre-alpine
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/resources/ci/build.yml
+
+<% resource_names.each do |resource| %>
+    - put: <%= resource %>-resource-latest
+      params:
+        build: <%= resource %>-resource-docker-image
+<% end %>
+                
+- name: java-buildpack-dependency-builder-docker-image
+  plan:
+  - aggregate:
+    - get: java-buildpack-dependency-builder-docker-image
+      trigger: true
+    - get: alpine-latest
+      trigger: true
+  - do:
+    - put: java-buildpack-dependency-builder-latest
+      params:
+        build: java-buildpack-dependency-builder-docker-image/java-buildpack-dependency-builder
+
+- name: openjdk-docker-image
+  plan:
+  - aggregate:
+    - get: openjdk-docker-image
+      trigger: true
+    - get: ubuntu-trusty
+      trigger: true
+  - do:
+    - put: openjdk-latest
+      params:
+        build: openjdk-docker-image/openjdk
+
+- name: google-stackdriver-debugger-docker-image
+  plan:
+  - aggregate:
+    - get: google-stackdriver-debugger-docker-image
+      trigger: true
+    - get: cflinuxfs2-latest
+      trigger: true
+  - do:
+    - put: google-stackdriver-debugger-latest
+      params:
+        build: google-stackdriver-debugger-docker-image/google-stackdriver-debugger
+
+- name: openjdk-trusty
+  plan:
+  - aggregate:
+    - resource: openjdk
+      get: java-buildpack-dependency-builder
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/openjdk-trusty.yml
+      params:
+        S3_BUCKET: java-buildpack
+        AWS_ACCESS_KEY_ID: {{s3-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ENDPOINT: https://minio.from-the.cloud:9000
+        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+- name: tomcat-7
+  plan:
+  - aggregate:
+    - resource: tomcat
+      get: java-buildpack-dependency-builder
+      trigger: true
+    - resource: tomcat-7-archives
+      trigger: true
+      get: tomcat-archives
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/tomcat.yml
+      params:
+        S3_BUCKET: java-buildpack
+        AWS_ACCESS_KEY_ID: {{s3-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ENDPOINT: https://minio.from-the.cloud:9000
+        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+- name: tomcat-8.0
+  plan:
+  - aggregate:
+    - resource: tomcat
+      get: java-buildpack-dependency-builder
+      trigger: true
+    - resource: tomcat-8.0-archives
+      trigger: true
+      get: tomcat-archives
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/tomcat.yml
+      params:
+        S3_BUCKET: java-buildpack
+        AWS_ACCESS_KEY_ID: {{s3-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ENDPOINT: https://minio.from-the.cloud:9000
+        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+- name: tomcat-8.5
+  plan:
+  - aggregate:
+    - resource: tomcat
+      get: java-buildpack-dependency-builder
+      trigger: true
+    - resource: tomcat-8.5-archives
+      trigger: true
+      get: tomcat-archives
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/tomcat.yml
+      params:
+        S3_BUCKET: java-buildpack
+        AWS_ACCESS_KEY_ID: {{s3-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ENDPOINT: https://minio.from-the.cloud:9000
+        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+- name: google-stackdriver-debugger-trusty 
+  plan:
+  - aggregate:
+    - resource: google-stackdriver-debugger-trusty 
+      get: java-buildpack-dependency-builder
+      trigger: true
+    - get: cloud-debug-java
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/google-stackdriver-debugger-trusty.yml
+      params:
+        S3_BUCKET: java-buildpack
+        AWS_ACCESS_KEY_ID: {{s3-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ENDPOINT: https://minio.from-the.cloud:9000
+        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+
+<% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
+- name: <%= resource %>
+  plan:
+  - aggregate:
+    - resource: <%= resource %>
+      get: java-buildpack-dependency-builder
+      trigger: true
+    - get: <%= resource %>-archives
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-dependency-builder/<%= resource %>.yml
+      params:
+        S3_BUCKET: java-buildpack
+        AWS_ACCESS_KEY_ID: {{s3-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ENDPOINT: https://minio.from-the.cloud:9000
+        DOWNLOAD_DOMAIN: https://minio.from-the.cloud:9000/java-buildpack
+<% end %>
+
