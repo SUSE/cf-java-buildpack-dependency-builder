@@ -1,0 +1,4 @@
+---
+java-buildpack-docker-org: splatform
+
+java-buildpack-dependency-builder-git-uri: git@github.com:SUSE/cf-java-buildpack-dependency-builder
