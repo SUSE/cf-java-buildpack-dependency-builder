@@ -15,7 +15,5 @@ then
   exit 1
 fi
 
-erb ${pipeline} > ${pipeline}.yml
-
-fly -t "$target" set-pipeline -p java-buildpack-dependency-builder -c ${pipeline}.yml \
+fly -t "$target" set-pipeline -p java-buildpack-dependency-builder -c <(erb "${pipeline}") \
 	    -l <(gpg -d --no-tty "${secrets}" 2> /dev/null) -l "${git_root}/ci/public-config.yml" 
