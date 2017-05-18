@@ -277,24 +277,24 @@ resources:
   type: docker-image
   source:
     repository: splatform/java-buildpack-dependency-builder
-    username: {{dockerhub-username}}
-    password: {{dockerhub-password}}
+    username: {{docker-username}}
+    password: {{docker-password}}
     email: cf-ci-bot@suse.de
 
 - name: openjdk-latest
   type: docker-image
   source:
     repository: splatform/openjdk
-    username: {{dockerhub-username}}
-    password: {{dockerhub-password}}
+    username: {{docker-username}}
+    password: {{docker-password}}
     email: cf-ci-bot@suse.de
 
 - name: google-stackdriver-debugger-latest
   type: docker-image
   source:
     repository: splatform/google-stackdriver-debugger
-    username: {{dockerhub-username}}
-    password: {{dockerhub-password}}
+    username: {{docker-username}}
+    password: {{docker-password}}
     email: cf-ci-bot@suse.de
 
 <% resource_names.each do |resource| %>
@@ -302,8 +302,8 @@ resources:
   type: docker-image
   source:
     repository: splatform/<%= resource %>-resource
-    username: {{dockerhub-username}}
-    password: {{dockerhub-password}}
+    username: {{docker-username}}
+    password: {{docker-password}}
     email: cf-ci-bot@suse.de
 <% end %>
 
