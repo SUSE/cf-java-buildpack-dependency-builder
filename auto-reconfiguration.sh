@@ -9,6 +9,7 @@ VERSION=$(cat auto-reconfiguration-archives/version)
 INDEX_PATH="/auto-reconfiguration/index.yml"
 UPLOAD_PATH="/auto-reconfiguration/auto-reconfiguration-$VERSION.jar"
 
+rm -f auto-reconfiguration-archives/auto-reconfiguration-*sources.jar
 transfer_to_s3 "auto-reconfiguration-archives/auto-reconfiguration-*.jar" $UPLOAD_PATH
 update_index $INDEX_PATH $VERSION $UPLOAD_PATH
 invalidate_cache $INDEX_PATH $UPLOAD_PATH
