@@ -29,12 +29,14 @@ resources:
   source:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
 
 - name: java-buildpack-dependency-builder-docker-image
   type: git
   source:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - java-buildpack-dependency-builder/Dockerfile
 
@@ -43,6 +45,7 @@ resources:
   source:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - openjdk/Dockerfile
 
@@ -51,6 +54,7 @@ resources:
   source:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - google-stackdriver-debugger/Dockerfile
 
@@ -59,6 +63,7 @@ resources:
   source:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - openjdk*
 
@@ -67,6 +72,7 @@ resources:
   source:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - tomcat.*
 
@@ -93,6 +99,7 @@ resources:
   source:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - <%= repo %>*
 <% end %>
