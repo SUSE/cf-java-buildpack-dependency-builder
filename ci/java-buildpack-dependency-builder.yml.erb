@@ -379,6 +379,8 @@ jobs:
     - put: java-buildpack-dependency-builder-latest
       params:
         build: java-buildpack-dependency-builder-docker-image/java-buildpack-dependency-builder
+      get_params:
+        skip_download: true
 
 - name: openjdk-docker-image
   plan:
@@ -391,6 +393,8 @@ jobs:
     - put: openjdk-latest
       params:
         build: openjdk-docker-image/openjdk
+      get_params:
+        skip_download: true
 
 - name: google-stackdriver-debugger-docker-image
   plan:
@@ -403,6 +407,8 @@ jobs:
     - put: google-stackdriver-debugger-latest
       params:
         build: google-stackdriver-debugger-docker-image/google-stackdriver-debugger
+      get_params:
+        skip_download: true
 
 - name: openjdk-trusty
   plan:
