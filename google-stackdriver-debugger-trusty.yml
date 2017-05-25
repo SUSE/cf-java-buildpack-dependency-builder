@@ -4,7 +4,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: cfje/google-stackdriver-debugger
+    repository: splatform/google-stackdriver-debugger
     tag: latest
 
 inputs:
@@ -19,6 +19,7 @@ params:
 
   AWS_ACCESS_KEY_ID:
   AWS_SECRET_ACCESS_KEY:
+  AWS_ENDPOINT:
   CLOUDFRONT_DISTRIBUTION_IDS:
   DOWNLOAD_DOMAIN:
   S3_BUCKET:
