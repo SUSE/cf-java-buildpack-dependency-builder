@@ -32,6 +32,8 @@ resources:
     uri: {{java-buildpack-dependency-builder-git-uri}}
     private_key: {{github-private-key}}
     branch: {{java-buildpack-dependency-builder-git-branch}}
+    paths:
+    - resources/**
 
 - name: java-buildpack-dependency-builder-docker-image
   type: git
