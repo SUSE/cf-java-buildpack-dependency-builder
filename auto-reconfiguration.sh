@@ -9,6 +9,8 @@ VERSION=$(cat auto-reconfiguration-archives/version)
 INDEX_PATH="/auto-reconfiguration/index.yml"
 UPLOAD_PATH="/auto-reconfiguration/auto-reconfiguration-$VERSION.jar"
 
+# The public archive contains a sources JAR file, remove it so it doesn't get
+# included in the call to transfer_to_s3.
 rm -f auto-reconfiguration-archives/java-buildpack-auto-reconfiguration-*sources.jar
 transfer_to_s3 "auto-reconfiguration-archives/java-buildpack-auto-reconfiguration-*.jar" $UPLOAD_PATH
 update_index $INDEX_PATH $VERSION $UPLOAD_PATH
