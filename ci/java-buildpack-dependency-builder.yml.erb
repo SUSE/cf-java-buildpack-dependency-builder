@@ -21,9 +21,11 @@ resources:
 
  ## Git Repos ##
 
-# Note: When testing different branches, you probably want to set it for every
-# resource that refers to `java-buildpack-dependency-builder-git-uri`. Multiple
-# resources for this URL are used to trigger on specific build scripts.
+# Note: When testing different branches, you probably want to set
+# `java-buildpack-dependency-builder-git-branch` in ci/public-config.yml for
+# every resource that refers to `java-buildpack-dependency-builder-git-uri`.
+# Multiple resources for this URL are used to trigger on specific build
+# scripts.
 - name: resources
   type: git
   source:
