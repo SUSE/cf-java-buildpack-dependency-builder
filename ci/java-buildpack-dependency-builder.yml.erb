@@ -420,11 +420,10 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/openjdk-trusty.yml
       params:
-        S3_BUCKET: java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: tomcat-7
   plan:
   - aggregate:
@@ -438,11 +437,10 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
-        S3_BUCKET: java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: tomcat-8.0
   plan:
   - aggregate:
@@ -456,11 +454,10 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
-        S3_BUCKET: java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: tomcat-8.5
   plan:
   - aggregate:
@@ -474,11 +471,10 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
-        S3_BUCKET: java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: google-stackdriver-debugger-trusty 
   plan:
   - aggregate:
@@ -491,11 +487,10 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/google-stackdriver-debugger-trusty.yml
       params:
-        S3_BUCKET: java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 
 <% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
 - name: <%= resource %>
@@ -510,10 +505,9 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/<%= resource %>.yml
       params:
-        S3_BUCKET: java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
         AWS_ACCESS_KEY_ID: {{s3-access-key}}
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 <% end %>
 
