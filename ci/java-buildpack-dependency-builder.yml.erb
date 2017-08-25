@@ -422,8 +422,8 @@ jobs:
       file: java-buildpack-dependency-builder/openjdk-trusty.yml
       params:
         S3_BUCKET: suse-cf-java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
         DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: tomcat-7
   plan:
@@ -439,8 +439,8 @@ jobs:
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
         S3_BUCKET: suse-cf-java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
         DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: tomcat-8.0
   plan:
@@ -456,8 +456,8 @@ jobs:
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
         S3_BUCKET: suse-cf-java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
         DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: tomcat-8.5
   plan:
@@ -473,8 +473,8 @@ jobs:
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
         S3_BUCKET: suse-cf-java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
         DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 - name: google-stackdriver-debugger-trusty 
   plan:
@@ -489,8 +489,8 @@ jobs:
       file: java-buildpack-dependency-builder/google-stackdriver-debugger-trusty.yml
       params:
         S3_BUCKET: suse-cf-java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
         DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 
 <% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
@@ -507,8 +507,8 @@ jobs:
       file: java-buildpack-dependency-builder/<%= resource %>.yml
       params:
         S3_BUCKET: suse-cf-java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
         DOWNLOAD_DOMAIN: suse-cf-java-buildpack.s3.amazonaws.com
 <% end %>
 
