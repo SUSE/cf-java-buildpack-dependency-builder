@@ -70,6 +70,7 @@ resources:
     branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - openjdk*
+    - common.sh
 
 - name: tomcat
   type: git
@@ -79,6 +80,7 @@ resources:
     branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - tomcat.*
+    - common.sh
 
 - name: tomcat-7-archives
   type: tomcat-resource
