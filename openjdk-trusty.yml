@@ -11,6 +11,9 @@ inputs:
 - name: java-archives
 - name: java-buildpack-dependency-builder
 
+outputs:
+- name: source-artifacts
+
 run:
   path: java-buildpack-dependency-builder/openjdk.sh
 
