@@ -10,6 +10,8 @@ image_resource:
 inputs:
 - name: java-buildpack-dependency-builder
 - name: tomee-resource-configuration-archives
+outputs:
+- name: source-artifacts
 
 run:
   path: java-buildpack-dependency-builder/tomee-resource-configuration.sh

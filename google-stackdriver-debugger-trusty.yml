@@ -10,6 +10,8 @@ image_resource:
 inputs:
 - name: cloud-debug-java
 - name: java-buildpack-dependency-builder
+outputs:
+- name: source-artifacts
 
 run:
   path: java-buildpack-dependency-builder/google-stackdriver-debugger.sh
