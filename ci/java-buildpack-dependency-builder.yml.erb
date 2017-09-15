@@ -26,6 +26,13 @@ resources:
 # every resource that refers to `java-buildpack-dependency-builder-git-uri`.
 # Multiple resources for this URL are used to trigger on specific build
 # scripts.
+- name: ci
+  type: git
+  source:
+    uri: {{java-buildpack-dependency-builder-git-uri}}
+    private_key: {{github-private-key}}
+    branch: {{java-buildpack-dependency-builder-git-branch}}
+
 - name: resources
   type: git
   source:
@@ -272,12 +279,12 @@ resources:
   type: docker-image
   source:
     repository: alpine
-            
+
 - name: cflinuxfs2-latest
   type: docker-image
   source:
     repository: cloudfoundry/cflinuxfs2
-            
+
 - name: ubuntu-trusty
   type: docker-image
   source:
@@ -316,7 +323,7 @@ resources:
 
 groups:
 - name: docker
-  jobs: 
+  jobs:
   - resource-docker-images
   - java-buildpack-dependency-builder-docker-image
   - openjdk-docker-image
@@ -367,7 +374,7 @@ jobs:
       params:
         build: <%= resource %>-resource-docker-image
 <% end %>
-                
+
 - name: java-buildpack-dependency-builder-docker-image
   plan:
   - aggregate:
@@ -416,6 +423,7 @@ jobs:
     - resource: openjdk
       get: java-buildpack-dependency-builder
       trigger: true
+    - get: ci
   - do:
     - task: build
       file: java-buildpack-dependency-builder/openjdk-trusty.yml
@@ -425,6 +433,13 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
         DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: ci/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
 - name: tomcat-7
   plan:
   - aggregate:
@@ -434,6 +449,7 @@ jobs:
     - resource: tomcat-7-archives
       trigger: true
       get: tomcat-archives
+    - get: ci
   - do:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
@@ -443,6 +459,13 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
         DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: ci/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
 - name: tomcat-8.0
   plan:
   - aggregate:
@@ -452,6 +475,7 @@ jobs:
     - resource: tomcat-8.0-archives
       trigger: true
       get: tomcat-archives
+    - get: ci
   - do:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
@@ -461,6 +485,13 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
         DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: ci/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
 - name: tomcat-8.5
   plan:
   - aggregate:
@@ -470,6 +501,7 @@ jobs:
     - resource: tomcat-8.5-archives
       trigger: true
       get: tomcat-archives
+    - get: ci
   - do:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
@@ -479,14 +511,22 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
         DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
-- name: google-stackdriver-debugger-trusty 
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: ci/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
+- name: google-stackdriver-debugger-trusty
   plan:
   - aggregate:
-    - resource: google-stackdriver-debugger-trusty 
+    - resource: google-stackdriver-debugger-trusty
       get: java-buildpack-dependency-builder
       trigger: true
     - get: cloud-debug-java
       trigger: true
+    - get: ci
   - do:
     - task: build
       file: java-buildpack-dependency-builder/google-stackdriver-debugger-trusty.yml
@@ -496,6 +536,13 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
         DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: ci/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
 
 <% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
 - name: <%= resource %>
@@ -506,6 +553,7 @@ jobs:
       trigger: true
     - get: <%= resource %>-archives
       trigger: true
+    - get: ci
   - do:
     - task: build
       file: java-buildpack-dependency-builder/<%= resource %>.yml
@@ -515,5 +563,12 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
         AWS_ENDPOINT: https://minio.from-the.cloud:9000
         DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        SOURCES_EXPORT_DIR: source-artifacts/
+    - task: push-sources
+      file: ci/ci/tasks/push-sources-to-obs.yml
+      params:
+        OBS_USERNAME:  {{obs-username}}
+        OBS_PASSWORD:  {{obs-password}}
+        PROJECT:       Cloud:Platform:sources:buildpacks
 <% end %>
 

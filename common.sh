@@ -45,7 +45,6 @@ transfer_to_s3() {
   local endpoint=$AWS_ENDPOINT
 
   echo "$source -> $target"
-
   aws --endpoint-url $endpoint s3 cp --quiet $source $target
 }
 
@@ -77,3 +76,17 @@ update_index() {
 
   (aws --endpoint-url $endpoint s3 cp $index_path - 2> /dev/null || echo '---') | printf -- "$(cat -)\n$version: $download_uri\n" | sort -u | aws --endpoint-url $endpoint s3 cp - $index_path --content-type 'text/x-yaml'
 }
+
+export_sources() {
+  if [[ -n "$SOURCES_EXPORT_DIR" ]]; then
+    echo "Exporting sources to the export directory..."
+    mkdir -p $SOURCES_EXPORT_DIR
+    for i in `ls | grep -v source-artifacts | grep -v java-buildpack-dependency-builder`; do
+      tar cfz "$SOURCES_EXPORT_DIR/$i.tar.gz" "$i"
+    done
+    echo "done"
+  fi
+}
+
+# Push all inputs as sources to OBS
+export_sources
