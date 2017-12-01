@@ -11,7 +11,7 @@ resource_types:
 
 <% maven_based_resource_names = %w(groovy tomee new-relic mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-certificate-trust-store container-customizer) %>
 
-<% artifactory_based_resource_names = %w(memory-calculator jvmkill auto-reconfiguration play-jpa-plugin redis-store) %>
+<% artifactory_based_resource_names = %w(memory-calculator jvmkill auto-reconfiguration redis-store) %>
 
 <% tomcat_based_resource_names = %w(tomcat-7 tomcat-8.0 tomcat-8.5) %>
 
@@ -246,14 +246,6 @@ resources:
     group_id: org.cloudfoundry
     repository: libs-release-local
 
-- name: play-jpa-plugin-archives
-  type: artifactory-resource
-  source:
-    uri: https://repo.spring.io
-    artifact_id: play-jpa-plugin
-    group_id: org.cloudfoundry
-    repository: libs-release-local
-
 - name: redis-store-archives
   type: artifactory-resource
   source:
@@ -343,7 +335,6 @@ groups:
   - new-relic
   - redis-store
   - mariadb-jdbc
-  - play-jpa-plugin
   - postgresql-jdbc
   - spring-boot-cli
   - memory-calculator
@@ -428,11 +419,11 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/openjdk-trusty.yml
       params:
-        S3_BUCKET: java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://suse-cf-java-buildpack.s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
         SOURCES_EXPORT_DIR: source-artifacts/
     - task: push-sources
       file: ci/ci/tasks/push-sources-to-obs.yml
@@ -454,11 +445,11 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
-        S3_BUCKET: java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://suse-cf-java-buildpack.s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
         SOURCES_EXPORT_DIR: source-artifacts/
     - task: push-sources
       file: ci/ci/tasks/push-sources-to-obs.yml
@@ -480,11 +471,11 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
-        S3_BUCKET: java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://suse-cf-java-buildpack.s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
         SOURCES_EXPORT_DIR: source-artifacts/
     - task: push-sources
       file: ci/ci/tasks/push-sources-to-obs.yml
@@ -506,11 +497,11 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/tomcat.yml
       params:
-        S3_BUCKET: java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://suse-cf-java-buildpack.s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
         SOURCES_EXPORT_DIR: source-artifacts/
     - task: push-sources
       file: ci/ci/tasks/push-sources-to-obs.yml
@@ -531,11 +522,11 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/google-stackdriver-debugger-trusty.yml
       params:
-        S3_BUCKET: java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://suse-cf-java-buildpack.s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
         SOURCES_EXPORT_DIR: source-artifacts/
     - task: push-sources
       file: ci/ci/tasks/push-sources-to-obs.yml
@@ -558,11 +549,11 @@ jobs:
     - task: build
       file: java-buildpack-dependency-builder/<%= resource %>.yml
       params:
-        S3_BUCKET: java-buildpack
-        AWS_ACCESS_KEY_ID: {{s3-access-key}}
-        AWS_SECRET_ACCESS_KEY: {{s3-secret-key}}
-        AWS_ENDPOINT: https://minio.from-the.cloud:9000
-        DOWNLOAD_DOMAIN: minio.from-the.cloud:9000/java-buildpack
+        S3_BUCKET: suse-cf-java-buildpack
+        AWS_ACCESS_KEY_ID: {{aws-access-key}}
+        AWS_SECRET_ACCESS_KEY: {{aws-secret-key}}
+        AWS_ENDPOINT: https://suse-cf-java-buildpack.s3.amazonaws.com
+        DOWNLOAD_DOMAIN: s3.amazonaws.com/suse-cf-java-buildpack
         SOURCES_EXPORT_DIR: source-artifacts/
     - task: push-sources
       file: ci/ci/tasks/push-sources-to-obs.yml
