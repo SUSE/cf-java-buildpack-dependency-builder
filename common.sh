@@ -45,7 +45,7 @@ transfer_to_s3() {
   local endpoint=$AWS_ENDPOINT
 
   echo "$source -> $target"
-  aws --endpoint-url $endpoint s3 cp --quiet $source $target
+  aws --endpoint-url $endpoint s3 cp $source $target
 }
 
 # $1: S3 index path without bucket
