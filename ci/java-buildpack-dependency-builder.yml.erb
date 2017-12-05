@@ -1,5 +1,5 @@
 ---
-<% resource_names = %w(maven tomcat wildfly your-kit artifactory) %>
+<% resource_names = %w(maven tomcat wildfly your-kit artifactory java) %>
 resource_types:
 <% resource_names.each do |resource| %>
 - name: <%= resource %>-resource
@@ -9,7 +9,7 @@ resource_types:
     tag: latest
 <% end %>
 
-<% maven_based_resource_names = %w(groovy tomee new-relic mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-certificate-trust-store container-customizer) %>
+<% maven_based_resource_names = %w(groovy tomee new-relic mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-customizer) %>
 
 <% artifactory_based_resource_names = %w(memory-calculator jvmkill auto-reconfiguration redis-store) %>
 
@@ -139,6 +139,12 @@ resources:
 - name: your-kit-archives
   type: your-kit-resource
 
+- name: java-archives
+  type: java-resource
+  source:
+    uri: http://www.oracle.com/technetwork/java/javase/8u-relnotes-2225394.html
+    version_pattern: "(1).(8).(0_151)-b(12)"
+
 - name: new-relic-archives
   type: maven-resource
   source:
@@ -206,14 +212,6 @@ resources:
     group_id: org.cloudfoundry
     packaging: jar
 
-- name: container-certificate-trust-store-archives
-  type: maven-resource
-  source:
-    uri: https://repo.spring.io/release
-    artifact_id: java-buildpack-container-certificate-trust-store
-    group_id: org.cloudfoundry
-    packaging: jar
-
 - name: container-customizer-archives
   type: maven-resource
   source:
@@ -242,7 +240,7 @@ resources:
   type: artifactory-resource
   source:
     uri: https://repo.spring.io
-    artifact_id: auto-reconfiguration
+    artifact_id: java-buildpack-auto-reconfiguration
     group_id: org.cloudfoundry
     repository: libs-release-local
 
@@ -344,8 +342,6 @@ groups:
   - tomcat-lifecycle-support
   - tomee-resource-configuration
   - tomcat-access-logging-support
-  - container-certificate-trust-store
-
 
 jobs:
 - name: resource-docker-images
@@ -415,6 +411,7 @@ jobs:
       get: java-buildpack-dependency-builder
       trigger: true
     - get: ci
+    - get: java-archives
   - do:
     - task: build
       file: java-buildpack-dependency-builder/openjdk-trusty.yml
