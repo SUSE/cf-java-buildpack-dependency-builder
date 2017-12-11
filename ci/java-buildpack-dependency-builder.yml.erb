@@ -15,7 +15,7 @@ resource_types:
 
 <% tomcat_based_resource_names = %w(tomcat-7 tomcat-8.0 tomcat-8.5) %>
 
-<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty) %>
+<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty client-certificate-mapper) %>
 
 resources:
 
@@ -68,6 +68,21 @@ resources:
     branch: {{java-buildpack-dependency-builder-git-branch}}
     paths:
     - google-stackdriver-debugger/Dockerfile
+
+- name: java-buildpack-client-certificate-mapper
+  type: git
+  source:
+    uri: https://github.com/SUSE/cf-java-buildpack-client-certificate-mapper.git
+    private_key: {{github-private-key}}
+    branch: release
+
+- name: client-certificate-mapper-archives
+  type: s3
+  source:
+    bucket: suse-cf-java-buildpack
+    regexp: client-certificate-mapper-archives/java-buildpack-client-certificate-mapper-(.*).jar
+    access_key_id: {{aws-access-key}}
+    secret_access_key: {{aws-secret-key}}
 
 - name: openjdk
   type: git
@@ -318,6 +333,7 @@ groups:
   - java-buildpack-dependency-builder-docker-image
   - openjdk-docker-image
   - google-stackdriver-debugger-docker-image
+  - client-certificate-mapper-archives
 - name: java-buildpack-dependency-builder
   jobs:
   - tomcat-7
@@ -342,6 +358,7 @@ groups:
   - tomcat-lifecycle-support
   - tomee-resource-configuration
   - tomcat-access-logging-support
+  - client-certificate-mapper
 
 jobs:
 - name: resource-docker-images
@@ -506,6 +523,7 @@ jobs:
         OBS_USERNAME:  {{obs-username}}
         OBS_PASSWORD:  {{obs-password}}
         PROJECT:       Cloud:Platform:sources:buildpacks
+
 - name: google-stackdriver-debugger-trusty
   plan:
   - aggregate:
@@ -531,6 +549,19 @@ jobs:
         OBS_USERNAME:  {{obs-username}}
         OBS_PASSWORD:  {{obs-password}}
         PROJECT:       Cloud:Platform:sources:buildpacks
+
+- name: client-certificate-mapper-archives
+  plan:
+  - aggregate:
+    - get: java-buildpack-client-certificate-mapper
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-client-certificate-mapper/ci/deploy.yml
+    - put: client-certificate-mapper-archives
+      params:
+        file: output/java-buildpack-client-certificate-mapper-*.jar
+        acl: public-read
 
 <% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
 - name: <%= resource %>
