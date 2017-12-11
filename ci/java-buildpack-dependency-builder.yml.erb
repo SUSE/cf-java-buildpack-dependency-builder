@@ -15,7 +15,7 @@ resource_types:
 
 <% tomcat_based_resource_names = %w(tomcat-7 tomcat-8.0 tomcat-8.5) %>
 
-<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty client-certificate-mapper container-security-provider) %>
+<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty client-certificate-mapper container-security-provider metric-writer) %>
 
 resources:
 
@@ -96,6 +96,21 @@ resources:
   source:
     bucket: suse-cf-java-buildpack
     regexp: container-security-provider-archives/java-buildpack-container-security-provider-(.*).jar
+    access_key_id: {{aws-access-key}}
+    secret_access_key: {{aws-secret-key}}
+
+- name: java-buildpack-metric-writer
+  type: git
+  source:
+    uri: https://github.com/SUSE/cf-java-buildpack-metric-writer.git
+    private_key: {{github-private-key}}
+    branch: release
+
+- name: metric-writer-archives
+  type: s3
+  source:
+    bucket: suse-cf-java-buildpack
+    regexp: metric-writer-archives/java-buildpack-metric-writer-(.*).jar
     access_key_id: {{aws-access-key}}
     secret_access_key: {{aws-secret-key}}
 
@@ -350,6 +365,7 @@ groups:
   - google-stackdriver-debugger-docker-image
   - client-certificate-mapper-archives
   - container-security-provider-archives
+  - metric-writer-archives
 - name: java-buildpack-dependency-builder
   jobs:
   - tomcat-7
@@ -376,6 +392,7 @@ groups:
   - tomcat-access-logging-support
   - client-certificate-mapper
   - container-security-provider
+  - metric-writer
 
 jobs:
 - name: resource-docker-images
@@ -591,6 +608,19 @@ jobs:
     - put: container-security-provider-archives
       params:
         file: output/java-buildpack-container-security-provider-*.jar
+        acl: public-read
+
+- name: metric-writer-archives
+  plan:
+  - aggregate:
+    - get: java-buildpack-metric-writer
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-metric-writer/ci/deploy.yml
+    - put: metric-writer-archives
+      params:
+        file: output/java-buildpack-metric-writer-*.jar
         acl: public-read
 
 <% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
