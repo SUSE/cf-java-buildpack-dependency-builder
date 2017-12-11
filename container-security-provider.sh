@@ -4,7 +4,7 @@ set -e -u -o pipefail
 
 source $(dirname "$0")/common.sh
 
-VERSION=$(cat container-security-provider-archives/version)
+VERSION=$(cat container-security-provider-archives/version | sed -re 's/\.([A-Z]+$)/_\1/g')
 
 INDEX_PATH="/container-security-provider/index.yml"
 UPLOAD_PATH="/container-security-provider/container-security-provider-$VERSION.jar"
