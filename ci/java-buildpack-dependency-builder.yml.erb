@@ -205,7 +205,7 @@ resources:
     artifact_id: mariadb-java-client
     group_id: org.mariadb.jdbc
     packaging: jar
-    version_pattern: (1\..+)
+    version_pattern: (2\.2\..+)
 
 - name: postgresql-jdbc-archives
   type: maven-resource
@@ -301,6 +301,7 @@ resources:
   type: git
   source:
     uri: https://github.com/GoogleCloudPlatform/cloud-debug-java
+    tag_filter: v2.16
 
  ## Docker Images ##
 
