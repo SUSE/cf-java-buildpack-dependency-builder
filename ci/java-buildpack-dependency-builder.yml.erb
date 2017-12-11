@@ -15,7 +15,7 @@ resource_types:
 
 <% tomcat_based_resource_names = %w(tomcat-7 tomcat-8.0 tomcat-8.5) %>
 
-<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty client-certificate-mapper) %>
+<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty client-certificate-mapper container-security-provider) %>
 
 resources:
 
@@ -81,6 +81,21 @@ resources:
   source:
     bucket: suse-cf-java-buildpack
     regexp: client-certificate-mapper-archives/java-buildpack-client-certificate-mapper-(.*).jar
+    access_key_id: {{aws-access-key}}
+    secret_access_key: {{aws-secret-key}}
+
+- name: java-buildpack-security-provider
+  type: git
+  source:
+    uri: https://github.com/SUSE/cf-java-buildpack-security-provider.git
+    private_key: {{github-private-key}}
+    branch: release
+
+- name: container-security-provider-archives
+  type: s3
+  source:
+    bucket: suse-cf-java-buildpack
+    regexp: container-security-provider-archives/java-buildpack-container-security-provider-(.*).jar
     access_key_id: {{aws-access-key}}
     secret_access_key: {{aws-secret-key}}
 
@@ -334,6 +349,7 @@ groups:
   - openjdk-docker-image
   - google-stackdriver-debugger-docker-image
   - client-certificate-mapper-archives
+  - container-security-provider-archives
 - name: java-buildpack-dependency-builder
   jobs:
   - tomcat-7
@@ -359,6 +375,7 @@ groups:
   - tomee-resource-configuration
   - tomcat-access-logging-support
   - client-certificate-mapper
+  - container-security-provider
 
 jobs:
 - name: resource-docker-images
@@ -561,6 +578,19 @@ jobs:
     - put: client-certificate-mapper-archives
       params:
         file: output/java-buildpack-client-certificate-mapper-*.jar
+        acl: public-read
+
+- name: container-security-provider-archives
+  plan:
+  - aggregate:
+    - get: java-buildpack-security-provider
+      trigger: true
+  - do:
+    - task: build
+      file: java-buildpack-security-provider/ci/deploy.yml
+    - put: container-security-provider-archives
+      params:
+        file: output/java-buildpack-container-security-provider-*.jar
         acl: public-read
 
 <% (wildcard_git_repos - %w(google-stackdriver-debugger-trusty)).each do |resource| %>
