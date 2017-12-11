@@ -4,7 +4,7 @@ set -e -u -o pipefail
 
 source $(dirname "$0")/common.sh
 
-VERSION=$(cat metric-writer-archives/version)
+VERSION=$(cat metric-writer-archives/version | sed -re 's/\.([A-Z]+$)/_\1/g')
 
 INDEX_PATH="/metric-writer/index.yml"
 UPLOAD_PATH="/metric-writer/metric-writer-$VERSION.jar"
