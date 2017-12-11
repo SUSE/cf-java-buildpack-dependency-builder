@@ -4,7 +4,7 @@ set -e -u -o pipefail
 
 source $(dirname "$0")/common.sh
 
-VERSION=$(cat client-certificate-mapper-archives/version)
+VERSION=$(cat client-certificate-mapper-archives/version | sed -re 's/\.([A-Z]+$)/_\1/g')
 
 INDEX_PATH="/client-certificate-mapper/index.yml"
 UPLOAD_PATH="/client-certificate-mapper/client-certificate-mapper-$VERSION.jar"
