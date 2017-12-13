@@ -4,6 +4,9 @@ set -e -u -o pipefail
 
 source $(dirname "$0")/common.sh
 
+# VersionResolver expects versions like X.Y.0_RELEASE and complains about X.Y.0.RELEASE
+# The `sed` below is a workaround to hide the warning but needs more investigation
+# on why this is needed.
 VERSION=$(cat client-certificate-mapper-archives/version | sed -re 's/\.([A-Z]+$)/_\1/g')
 
 INDEX_PATH="/client-certificate-mapper/index.yml"
