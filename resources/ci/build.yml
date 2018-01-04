@@ -17,7 +17,6 @@ outputs:
 - name: pivotal-network-resource-docker-image
 - name: tomcat-resource-docker-image
 - name: wildfly-resource-docker-image
-- name: your-kit-resource-docker-image
 
 run:
   path: java-buildpack-dependency-builder/resources/ci/build.sh
