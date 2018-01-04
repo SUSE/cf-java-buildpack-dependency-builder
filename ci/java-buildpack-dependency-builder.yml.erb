@@ -1,5 +1,5 @@
 ---
-<% resource_names = %w(maven tomcat wildfly your-kit artifactory java) %>
+<% resource_names = %w(maven tomcat wildfly artifactory java) %>
 resource_types:
 <% resource_names.each do |resource| %>
 - name: <%= resource %>-resource
@@ -9,13 +9,13 @@ resource_types:
     tag: latest
 <% end %>
 
-<% maven_based_resource_names = %w(groovy tomee new-relic mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-customizer) %>
+<% maven_based_resource_names = %w(groovy tomee mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-customizer) %>
 
 <% artifactory_based_resource_names = %w(memory-calculator jvmkill auto-reconfiguration redis-store) %>
 
 <% tomcat_based_resource_names = %w(tomcat-7 tomcat-8.0 tomcat-8.5) %>
 
-<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly your-kit google-stackdriver-debugger-trusty client-certificate-mapper container-security-provider metric-writer) %>
+<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly google-stackdriver-debugger-trusty client-certificate-mapper container-security-provider metric-writer) %>
 
 resources:
 
@@ -181,22 +181,11 @@ resources:
 - name: wildfly-archives
   type: wildfly-resource
 
-- name: your-kit-archives
-  type: your-kit-resource
-
 - name: java-archives
   type: java-resource
   source:
     uri: http://www.oracle.com/technetwork/java/javase/8u-relnotes-2225394.html
     version_pattern: (\d)\.(\d)\.0_(\d{1,3})-b(\d{1,3})
-
-- name: new-relic-archives
-  type: maven-resource
-  source:
-    uri: https://repo1.maven.org/maven2
-    artifact_id: newrelic-agent
-    group_id: com.newrelic.agent.java
-    packaging: jar
 
 - name: mariadb-jdbc-archives
   type: maven-resource
@@ -378,8 +367,6 @@ groups:
   - groovy
   - jvmkill
   - wildfly
-  - your-kit
-  - new-relic
   - redis-store
   - mariadb-jdbc
   - postgresql-jdbc
