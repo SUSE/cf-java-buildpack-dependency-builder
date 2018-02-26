@@ -9,7 +9,7 @@ resource_types:
     tag: latest
 <% end %>
 
-<% maven_based_resource_names = %w(groovy tomee mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-customizer) %>
+<% maven_based_resource_names = %w(jacoco groovy tomee mariadb-jdbc postgresql-jdbc spring-boot-cli tomcat-access-logging-support tomcat-lifecycle-support tomee-resource-configuration tomcat-logging-support container-customizer) %>
 
 <% artifactory_based_resource_names = %w(memory-calculator jvmkill auto-reconfiguration redis-store) %>
 
@@ -168,6 +168,16 @@ resources:
     group_id: org.codehaus.groovy
     packaging: zip
     version_pattern: (2\.4\..+)
+
+- name: jacoco-archives
+  type: maven-resource
+  source:
+    uri: https://repo1.maven.org/maven2
+    artifact_id: jacoco-agent
+    group_id: org.jacoco.agent
+    packaging: jar
+    classifier: webprofile
+    version_pattern: (0\.8\..+)
 
 - name: tomee-archives
   type: maven-resource
@@ -364,6 +374,7 @@ groups:
   - openjdk-trusty
   - google-stackdriver-debugger-trusty
   - tomee
+  - jacoco
   - groovy
   - jvmkill
   - wildfly
