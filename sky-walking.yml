@@ -1,0 +1,25 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: splatform/java-buildpack-dependency-builder
+    tag: latest
+
+inputs:
+- name: java-buildpack-dependency-builder
+- name: sky-walking-archives
+outputs:
+- name: source-artifacts
+
+run:
+  path: java-buildpack-dependency-builder/sky-walking.sh
+
+params:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+  AWS_ENDPOIONT:
+  CLOUDFRONT_DISTRIBUTION_IDS:
+  DOWNLOAD_DOMAIN:
+  S3_BUCKET:

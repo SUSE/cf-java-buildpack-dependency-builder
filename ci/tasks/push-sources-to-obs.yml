@@ -3,7 +3,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: machinerytool/osc_opensuse
+    repository: splatform/binary_builder_obs_opensuse
 inputs:
   - name: ci
   - name: source-artifacts

@@ -15,7 +15,7 @@ resource_types:
 
 <% tomcat_based_resource_names = %w(tomcat-7 tomcat-8.0 tomcat-8.5) %>
 
-<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly google-stackdriver-debugger-trusty client-certificate-mapper container-security-provider metric-writer) %>
+<% wildcard_git_repos = maven_based_resource_names + artifactory_based_resource_names + %w(wildfly google-stackdriver-debugger-trusty client-certificate-mapper container-security-provider metric-writer sky-walking) %>
 
 resources:
 
@@ -173,10 +173,9 @@ resources:
   type: maven-resource
   source:
     uri: https://repo1.maven.org/maven2
-    artifact_id: jacoco-agent
-    group_id: org.jacoco.agent
+    artifact_id: org.jacoco.agent
+    group_id: org.jacoco
     packaging: jar
-    classifier: webprofile
     version_pattern: (0\.8\..+)
 
 - name: tomee-archives
@@ -302,6 +301,15 @@ resources:
     uri: https://github.com/GoogleCloudPlatform/cloud-debug-java
     tag_filter: v2.16
 
+# there is no maven package published yet
+- name: sky-walking-archives
+  type: github-release
+  source:
+    owner: apache
+    repository: incubator-skywalking
+    private_key: {{github-private-key}}
+    access_token: {{github-access-token}}
+
  ## Docker Images ##
 
 - name: openjdk-8-jre-alpine
@@ -392,6 +400,7 @@ groups:
   - client-certificate-mapper
   - container-security-provider
   - metric-writer
+  - sky-walking
 
 jobs:
 - name: resource-docker-images
